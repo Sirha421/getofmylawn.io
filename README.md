@@ -1,37 +1,5 @@
 Our project code sample - we used python to build an rough authentification API provided by AUth0.
 
-Python Snippet:
-{import sys
-import urlib2
-from fuctools import wraps
-import json
-from os import environ as env
-from werkzeug.exceptions import HTTPException
-
-from dotenv import load_dotenv, find_dotenv
-from flask import Flask
-from flask import jsonify
-from falsk import redirect
-from flask import render_template
-from flask import session
-from flask import url_for
-from authlib.flask.client import OAuth
-from six.moves.urllib.parse import urlencode
-from functools import wraps
-
-app = Flask(_name_)
-oauth =OAuth(app)
-auth0 = oauth.regsiter(
-    'auth0',
-    client_id='PV3CP3453ypFoMT9daF9sb76pXM2LabM',
-    client_secret='y-4zAUFnNYWkW5evfr8fisiTB86dGPYQ5F2Kez20wt-qeyzAoVPdhNbGQhGueXIN',
-    api_base_url='https://getoffmylawn.auth0.com',
-    access_token_url='https://getoffmylawn.auth0.com/oauth/token',
-    authorize_url='https://getoffmylawn.auth0.com/authorize',
-    client_kwargs={
-        'scope': 'openid profile',
-    },
-    )
 
 def requires_auth(f):
     @wraps(f)
