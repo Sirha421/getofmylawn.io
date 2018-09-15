@@ -1,0 +1,77 @@
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">sys</span>
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">fuctools</span> <span style="color: #008000; font-weight: bold">import</span> wraps
+    <span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">os</span> <span style="color: #008000; font-weight: bold">import</span> environ <span style="color: #008000; font-weight: bold">as</span> env
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">werkzeug.exceptions</span> <span style="color: #008000; font-weight: bold">import</span> HTTPException
+    
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">dotenv</span> <span style="color: #008000; font-weight: bold">import</span> load_dotenv, find_dotenv
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">flask</span> <span style="color: #008000; font-weight: bold">import</span> Flask
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">flask</span> <span style="color: #008000; font-weight: bold">import</span> jsonify
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">falsk</span> <span style="color: #008000; font-weight: bold">import</span> redirect
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">flask</span> <span style="color: #008000; font-weight: bold">import</span> render_template
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">flask</span> <span style="color: #008000; font-weight: bold">import</span> session
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">flask</span> <span style="color: #008000; font-weight: bold">import</span> url_for
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">authlib.flask.client</span> <span style="color: #008000; font-weight: bold">import</span> OAuth
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">six.moves.urllib.parse</span> <span style="color: #008000; font-weight: bold">import</span> urlencode
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">functools</span> <span style="color: #008000; font-weight: bold">import</span> wraps
+    
+    app <span style="color: #666666">=</span> Flask(name)
+    oauth <span style="color: #666666">=</span>OAuth(app)
+    auth0 <span style="color: #666666">=</span> oauth<span style="color: #666666">.</span>regsiter(
+        <span style="color: #BA2121">&#39;auth0&#39;</span>,
+        client_id<span style="color: #666666">=</span><span style="color: #BA2121">&#39;PV3CP3453ypFoMT9daF9sb76pXM2LabM&#39;</span>,
+        client_secret<span style="color: #666666">=</span><span style="color: #BA2121">&#39;y-4zAUFnNYWkW5evfr8fisiTB86dGPYQ5F2Kez20wt-qeyzAoVPdhNbGQhGueXIN&#39;</span>,
+        api_base_url<span style="color: #666666">=</span><span style="color: #BA2121">&#39;https://getoffmylawn.auth0.com
+    &#39;</span>,
+        access_token_url<span style="color: #666666">=</span><span style="color: #BA2121">&#39;https://getoffmylawn.auth0.com/oauth/token&#39
+    ;</span>,
+        authorize_url<span style="color: #666666">=</span><span style="color: #BA2121">&#39;https://getoffmylawn.auth0.com/authorize&#39
+    ;</span>,
+        client_kwargs<span style="color: #666666">=</span>{
+            <span style="color: #BA2121">&#39;scope&#39;</span>: <span style="color: #BA2121">&#39;openid profile&#39;</span>,
+        },
+        )
+    
+    <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">requires_auth</span>(f):
+        <span style="color: #AA22FF">@wraps</span>(f)
+        <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">decorate</span>(<span style="color: #666666">*</span>args, <span style="color: #666666">**</span>kwargs):
+            <span style="color: #008000; font-weight: bold">if</span> <span style="color: #BA2121">&#39;profile&#39;</span> <span style="color: #AA22FF; font-weight: bold">not</span> <span style="color: #AA22FF; font-weight: bold">in</span> session:
+                <span style="color: #AA22FF">@app.route</span>(<span style="color: #BA2121">&#39;/login&#39;</span>)
+                <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">login</span>():
+                    <span style="color: #008000; font-weight: bold">return</span> auth0<span style="color: #666666">.</span>authorize_redirect(redirect_uri <span style="color: #666666">=</span><span style="color: #BA2121">&#39; http://localhost:3000/callback&#39
+    ;</span>, audience<span style="color: #666666">=</span><span style="color: #BA2121">&#39;https://getoffmylawn.auth0.com/userinfo&#39
+    ;</span>)
+                <span style="color: #008000; font-weight: bold">return</span> redirect(<span style="color: #BA2121">&#39;/&#39;</span>)
+            returnf(<span style="color: #666666">*</span>args, <span style="color: #666666">**</span>kwargs)
+            <span style="color: #008000; font-weight: bold">return</span> decorated
+    
+    <span style="color: #AA22FF">@app.route</span>(<span style="color: #BA2121">&#39;/dashboard&#39;</span>)
+    <span style="color: #AA22FF">@requires_auth</span>
+    <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">dashboard</span>():
+        <span style="color: #008000; font-weight: bold">return</span> render_template(<span style="color: #BA2121">&#39;dashboard.html&#39;</span>,
+                               userinfo<span style="color: #666666">=</span>session[<span style="color: #BA2121">&#39;profile&#39;</span>],
+                               userinfo_pretty<span style="color: #666666">=</span>json<span style="color: #666666">.</span>dumps(session[<span style="color: #BA2121">&#39;jwt_payload&#39;</span>], indent<span style="color: #666666">=4</span>))
+    
+    
+    
+    
+    <span style="color: #AA22FF">@app.route</span>(<span style="color: #BA2121">&#39;/callback&#39;</span>)
+    <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">callback_handling</span>():
+        auth0<span style="color: #666666">.</span>authorize_access_token()
+        resp <span style="color: #666666">=</span> auth0<span style="color: #666666">.</span>get(<span style="color: #BA2121">&#39;userinfor&#39;</span>)
+        userinfo <span style="color: #666666">=</span> resp<span style="color: #666666">.</span>json()
+    
+        session[<span style="color: #BA2121">&#39;jwt_payload&#39;</span>] <span style="color: #666666">=</span> userinfo
+        session[<span style="color: #BA2121">&#39;profile&#39;</span>]<span style="color: #666666">=</span>{
+            <span style="color: #BA2121">&#39;user_id&#39;</span>: userinfo[<span style="color: #BA2121">&#39;sub&#39;</span>],
+            <span style="color: #BA2121">&#39;name&#39;</span>: userinfo[<span style="color: #BA2121">&#39;name&#39;</span>],
+            <span style="color: #BA2121">&#39;picture&#39;</span>: userinfo[<span style="color: #BA2121">&#39;picture&#39;</span>]
+            }
+        <span style="color: #008000; font-weight: bold">return</span> redirect(<span style="color: #BA2121">&#39;/dashboard&#39;</span>)
+    
+    <span style="color: #AA22FF">@app.route</span>(<span style="color: #BA2121">&#39;/logout&#39;</span>)
+    <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">logout</span>():
+        session<span style="color: #666666">.</span>clear()
+        params <span style="color: #666666">=</span> {<span style="color: #BA2121">&#39;returnTo&#39;</span>: url_for(<span style="color: #BA2121">&#39;home&#39;</span>,_external<span style="color: #666666">=</span><span style="color: #008000">True</span>), <span style="color: #BA2121">&#39;client_id&#39;</span>: <span style="color: #BA2121">&#39;PV3CP3453ypFoMT9daF9sb76pXM2LabM&#39;</span>}
+        <span style="color: #008000; font-weight: bold">return</span> redirect(auth0<span style="color: #666666">.</span>api_base_url <span style="color: #666666">+</span><span style="color: #BA2121">&#39;/v2/logout?&#39;</span> <span style="color: #666666">+</span> urlencode(parems))
+    </pre></div>
